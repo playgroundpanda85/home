@@ -25,7 +25,11 @@
             width: 100vw; /* Full viewport width */
             display: flex;
             justify-content: center;
-            align-items: center;
+            /* Vertikale Ausrichtung von der Mitte nach oben verschoben */
+            align-items: flex-start;
+            /* Abstand von oben hinzugefügt */
+            padding-top: 20vh;
+            box-sizing: border-box; /* Stellt sicher, dass Padding die Höhe nicht beeinflusst */
             text-align: center;
             color: white; /* White text for contrast */
             /* Optional: Add an overlay for better text readability if the image is busy */
