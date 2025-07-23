@@ -26,6 +26,32 @@
             color: var(--text-color);
             overflow: hidden;
         }
+        
+        /* --- NEUER KNOPF: Zurück zur Homepage --- */
+        .home-btn {
+            position: absolute;
+            top: 20px;
+            left: 20px;
+            width: 40px; /* Grösse anpassen */
+            height: 40px; /* Grösse anpassen */
+            border-radius: 50%; /* Macht den Knopf rund */
+            background-color: var(--secondary-color); /* Fallback-Farbe */
+            
+            /* --- HIER BILD-URL EINFÜGEN --- */
+            /* Ersetze 'home-icon.png' mit dem Dateinamen deines Bildes. */
+            /* Das Bild muss im selben Ordner wie diese HTML-Datei sein. */
+            background-image: url('https://placehold.co/40x40/424242/FFFFFF?text=H');
+            
+            background-size: cover; /* Stellt sicher, dass das Bild den Knopf ausfüllt */
+            background-position: center;
+            z-index: 100; /* Stellt sicher, dass der Knopf über allem liegt */
+            transition: transform 0.2s ease;
+        }
+
+        .home-btn:hover {
+            transform: scale(1.1); /* Leichte Vergrösserung beim Darüberfahren */
+        }
+
 
         .app-container {
             display: flex;
@@ -197,8 +223,11 @@
 
     </style>
 </head>
-
 <body>
+    
+    <!-- NEUER KNOPF: Link zur Homepage -->
+    <a href="../" class="home-btn"></a>
+
     <div class="app-container">
         <button class="reset-btn" id="reset-btn">
             <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor">
@@ -216,9 +245,9 @@
             <div class="form-group">
                 <label for="rhythm-select">Rhythmus</label>
                 <select id="rhythm-select">
-                    <option value="2000">Langsam (2s)</option>
-                    <option value="1500" selected>Mittel (1.5s)</option>
-                    <option value="1000">Schnell (1s)</option>
+                    <option value="4000">Langsam (4s)</option>
+                    <option value="3000" selected>Mittel (3s)</option>
+                    <option value="2000">Schnell (2s)</option>
                 </select>
             </div>
             <div class="form-group">
@@ -279,7 +308,7 @@
             // --- App State ---
             let settings = {
                 breaths: 30,
-                rhythm: 1500,
+                rhythm: 3000,
                 rounds: 3,
             };
             let state = {
@@ -450,3 +479,14 @@
     </script>
 </body>
 </html>
+```
+
+### So personalisierst du den Knopf:
+
+1.  **Bild vorbereiten:** Erstelle ein kleines, rundes Bild (z.B. im Format `.png` oder `.jpg`) und gib ihm einen einfachen Namen, z.B. `home-icon.png`.
+2.  **Bild hochladen:** Lege diese Bilddatei in den `atem-app`-Ordner in deinem GitHub-Repository, also genau dorthin, wo auch die `index.html`-Datei der App liegt.
+3.  **Code anpassen:**
+    * Suche im CSS-Code nach dem Kommentar `/* --- HIER BILD-URL EINFÜGEN --- */`.
+    * Ändere die Zeile `background-image: url('https://placehold.co/40x40/424242/FFFFFF?text=H');` zu `background-image: url('home-icon.png');` (ersetze `home-icon.png` mit deinem Dateinamen).
+
+Der Link `href="../"` im neuen `<a>`-Tag sorgt dafür, dass du immer korrekt eine Ebene nach oben zur Homepage navigierst, genau wie in der Anleitung beschrieb
