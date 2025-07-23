@@ -1,0 +1,452 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Atem-App</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/tone/14.7.77/Tone.js"></script>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;700&display=swap');
+
+        :root {
+            --bg-color: #121212;
+            --text-color: #E0E0E0;
+            --primary-color: #FFFFFF;
+            --secondary-color: #424242;
+            --accent-color: #BBBBBB;
+        }
+
+        html, body {
+            width: 100%;
+            height: 100%;
+            margin: 0;
+            padding: 0;
+            font-family: 'Inter', sans-serif;
+            background-color: var(--bg-color);
+            color: var(--text-color);
+            overflow: hidden;
+        }
+
+        .app-container {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            width: 100%;
+            height: 100%;
+            position: relative;
+        }
+
+        .screen {
+            display: none;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            text-align: center;
+            width: 100%;
+            max-width: 400px;
+            padding: 20px;
+            box-sizing: border-box;
+        }
+
+        .screen.active {
+            display: flex;
+        }
+
+        /* --- Setup Screen --- */
+        #setup-screen h1 {
+            font-weight: 700;
+            font-size: 2.5rem;
+            margin-bottom: 40px;
+            color: var(--primary-color);
+        }
+
+        .form-group {
+            margin-bottom: 25px;
+            width: 100%;
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 10px;
+            font-size: 1rem;
+            font-weight: 400;
+            color: var(--accent-color);
+        }
+
+        .form-group input, .form-group select {
+            width: 100%;
+            padding: 12px;
+            background-color: var(--secondary-color);
+            border: 1px solid var(--secondary-color);
+            border-radius: 8px;
+            color: var(--text-color);
+            font-size: 1.1rem;
+            box-sizing: border-box;
+        }
+
+        .start-btn {
+            padding: 15px 40px;
+            font-size: 1.2rem;
+            font-weight: 700;
+            background-color: var(--primary-color);
+            color: var(--bg-color);
+            border: none;
+            border-radius: 50px;
+            cursor: pointer;
+            transition: transform 0.2s ease, background-color 0.2s ease;
+            margin-top: 20px;
+        }
+
+        .start-btn:hover {
+            transform: scale(1.05);
+        }
+
+        /* --- Breathing Screen --- */
+        .breathing-circle {
+            width: 200px;
+            height: 200px;
+            border-radius: 50%;
+            background-color: var(--secondary-color);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            transition: transform 3s ease-in-out;
+        }
+
+        .breathing-circle.breathing-in {
+            transform: scale(1.5);
+            background-color: #333;
+        }
+
+        .breathing-text {
+            font-size: 2rem;
+            font-weight: 300;
+            color: var(--accent-color);
+            transition: opacity 0.5s ease;
+        }
+
+        .breath-count {
+            position: absolute;
+            bottom: 10%;
+            font-size: 1.5rem;
+            color: var(--accent-color);
+        }
+        
+        .round-count {
+            position: absolute;
+            top: 10%;
+            font-size: 1.5rem;
+            color: var(--accent-color);
+        }
+
+        /* --- Hold & Recovery Screens --- */
+        #hold-screen h2, #recovery-screen h2 {
+            font-size: 1.8rem;
+            font-weight: 400;
+            margin-bottom: 30px;
+        }
+
+        .timer {
+            font-size: 5rem;
+            font-weight: 700;
+            color: var(--primary-color);
+            margin-bottom: 40px;
+        }
+
+        .hold-btn {
+            width: 180px;
+            height: 180px;
+            border-radius: 50%;
+            background-color: var(--primary-color);
+            color: var(--bg-color);
+            border: none;
+            font-size: 1.5rem;
+            font-weight: 700;
+            cursor: pointer;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            transition: transform 0.2s ease;
+        }
+
+        .hold-btn:hover {
+            transform: scale(1.05);
+        }
+
+        /* --- Reset Button --- */
+        .reset-btn {
+            position: absolute;
+            top: 20px;
+            right: 20px;
+            background: none;
+            border: none;
+            cursor: pointer;
+            padding: 10px;
+        }
+
+        .reset-btn svg {
+            width: 24px;
+            height: 24px;
+            stroke: var(--accent-color);
+            transition: stroke 0.2s ease;
+        }
+        
+        .reset-btn:hover svg {
+            stroke: var(--primary-color);
+        }
+
+    </style>
+</head>
+
+<body>
+    <div class="app-container">
+        <button class="reset-btn" id="reset-btn">
+            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor">
+              <path stroke-linecap="round" stroke-linejoin="round" d="M8.25 9V5.25A2.25 2.25 0 0 1 10.5 3h6a2.25 2.25 0 0 1 2.25 2.25v13.5A2.25 2.25 0 0 1 16.5 21h-6a2.25 2.25 0 0 1-2.25-2.25V15m-3 0-3-3m0 0 3-3m-3 3H15" />
+            </svg>
+        </button>
+
+        <!-- Setup Screen -->
+        <div id="setup-screen" class="screen active">
+            <h1>Atemübung</h1>
+            <div class="form-group">
+                <label for="breath-count-input">Atemzüge pro Runde</label>
+                <input type="number" id="breath-count-input" value="30" min="10" max="60">
+            </div>
+            <div class="form-group">
+                <label for="rhythm-select">Rhythmus</label>
+                <select id="rhythm-select">
+                    <option value="2000">Langsam (2s)</option>
+                    <option value="1500" selected>Mittel (1.5s)</option>
+                    <option value="1000">Schnell (1s)</option>
+                </select>
+            </div>
+            <div class="form-group">
+                <label for="round-count-input">Anzahl Runden</label>
+                <input type="number" id="round-count-input" value="3" min="1" max="10">
+            </div>
+            <button id="start-btn" class="start-btn">Start</button>
+        </div>
+
+        <!-- Breathing Screen (Phase 1) -->
+        <div id="breathing-screen" class="screen">
+            <div class="round-count" id="round-count-display"></div>
+            <div class="breathing-circle" id="breathing-circle">
+                <span class="breathing-text" id="breathing-text"></span>
+            </div>
+            <div class="breath-count" id="breath-count-display"></div>
+        </div>
+
+        <!-- Hold Screen (Phase 2) -->
+        <div id="hold-screen" class="screen">
+            <h2>Luft anhalten</h2>
+            <div class="timer" id="hold-timer">00:00</div>
+            <button class="hold-btn" id="stop-hold-btn">Weiter</button>
+        </div>
+
+        <!-- Recovery Screen (Phase 3) -->
+        <div id="recovery-screen" class="screen">
+            <h2>Tief einatmen und halten</h2>
+            <div class="timer" id="recovery-timer">15</div>
+        </div>
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            // --- DOM Elements ---
+            const screens = {
+                setup: document.getElementById('setup-screen'),
+                breathing: document.getElementById('breathing-screen'),
+                hold: document.getElementById('hold-screen'),
+                recovery: document.getElementById('recovery-screen'),
+            };
+
+            const startBtn = document.getElementById('start-btn');
+            const resetBtn = document.getElementById('reset-btn');
+            const stopHoldBtn = document.getElementById('stop-hold-btn');
+
+            const breathCountInput = document.getElementById('breath-count-input');
+            const rhythmSelect = document.getElementById('rhythm-select');
+            const roundCountInput = document.getElementById('round-count-input');
+            
+            const breathingCircle = document.getElementById('breathing-circle');
+            const breathingText = document.getElementById('breathing-text');
+            const breathCountDisplay = document.getElementById('breath-count-display');
+            const roundCountDisplay = document.getElementById('round-count-display');
+            const holdTimerDisplay = document.getElementById('hold-timer');
+            const recoveryTimerDisplay = document.getElementById('recovery-timer');
+
+            // --- App State ---
+            let settings = {
+                breaths: 30,
+                rhythm: 1500,
+                rounds: 3,
+            };
+            let state = {
+                currentRound: 0,
+                currentBreath: 0,
+                phase: 'setup', // 'setup', 'breathing', 'hold', 'recovery'
+                intervalId: null,
+                holdTimerId: null,
+            };
+
+            // --- Audio Synthesis (Tone.js) ---
+            let breathSynth, gongSynth;
+            
+            function initializeAudio() {
+                if (!breathSynth) {
+                    breathSynth = new Tone.Synth({
+                        oscillator: { type: 'sine' },
+                        envelope: { attack: 0.1, decay: 0.5, sustain: 0.1, release: 1 },
+                    }).toDestination();
+                }
+                if (!gongSynth) {
+                     gongSynth = new Tone.MembraneSynth({
+                        pitchDecay: 0.05,
+                        octaves: 10,
+                        oscillator: { type: 'sine' },
+                        envelope: { attack: 0.001, decay: 0.8, sustain: 0.01, release: 1.4, attackCurve: 'exponential' }
+                    }).toDestination();
+                }
+            }
+
+            function playBreathSound(isInhale) {
+                if (!breathSynth) return;
+                const note = isInhale ? 'C4' : 'G3';
+                breathSynth.triggerAttackRelease(note, '8n');
+            }
+
+            function playGong() {
+                if (!gongSynth) return;
+                gongSynth.triggerAttackRelease('C2', '1n');
+            }
+
+            // --- Screen Management ---
+            function showScreen(screenName) {
+                Object.values(screens).forEach(screen => screen.classList.remove('active'));
+                screens[screenName].classList.add('active');
+            }
+
+            // --- Helper Functions ---
+            function formatTime(seconds) {
+                const mins = Math.floor(seconds / 60).toString().padStart(2, '0');
+                const secs = (seconds % 60).toString().padStart(2, '0');
+                return `${mins}:${secs}`;
+            }
+
+            // --- Core Logic ---
+            function startSession() {
+                // Ensure audio context is started by user gesture
+                if (Tone.context.state !== 'running') {
+                    Tone.start();
+                }
+                initializeAudio();
+
+                settings.breaths = parseInt(breathCountInput.value);
+                settings.rhythm = parseInt(rhythmSelect.value);
+                settings.rounds = parseInt(roundCountInput.value);
+                
+                state.currentRound = 1;
+                startBreathingPhase();
+            }
+
+            function startBreathingPhase() {
+                state.phase = 'breathing';
+                showScreen('breathing');
+                roundCountDisplay.textContent = `Runde ${state.currentRound} / ${settings.rounds}`;
+                
+                state.currentBreath = 0;
+                let isBreathingIn = true;
+
+                // Initial breath
+                setTimeout(() => {
+                    breathe();
+                    state.intervalId = setInterval(breathe, settings.rhythm);
+                }, 500);
+
+                function breathe() {
+                    if (state.currentBreath >= settings.breaths) {
+                        clearInterval(state.intervalId);
+                        playGong();
+                        setTimeout(startHoldPhase, 1000); // Wait for gong to fade
+                        return;
+                    }
+
+                    if (isBreathingIn) {
+                        state.currentBreath++;
+                        breathingText.textContent = 'Ein';
+                        breathCountDisplay.textContent = `${state.currentBreath} / ${settings.breaths}`;
+                        breathingCircle.classList.add('breathing-in');
+                        playBreathSound(true);
+                    } else {
+                        breathingText.textContent = 'Aus';
+                        breathingCircle.classList.remove('breathing-in');
+                        playBreathSound(false);
+                    }
+                    isBreathingIn = !isBreathingIn;
+                }
+            }
+
+            function startHoldPhase() {
+                state.phase = 'hold';
+                showScreen('hold');
+                
+                let holdSeconds = 0;
+                holdTimerDisplay.textContent = formatTime(holdSeconds);
+
+                state.holdTimerId = setInterval(() => {
+                    holdSeconds++;
+                    holdTimerDisplay.textContent = formatTime(holdSeconds);
+                }, 1000);
+            }
+
+            function stopHoldPhase() {
+                clearInterval(state.holdTimerId);
+                playGong();
+                startRecoveryPhase();
+            }
+
+            function startRecoveryPhase() {
+                state.phase = 'recovery';
+                showScreen('recovery');
+
+                let recoverySeconds = 15;
+                recoveryTimerDisplay.textContent = recoverySeconds;
+
+                state.intervalId = setInterval(() => {
+                    recoverySeconds--;
+                    recoveryTimerDisplay.textContent = recoverySeconds;
+                    if (recoverySeconds <= 0) {
+                        clearInterval(state.intervalId);
+                        endRound();
+                    }
+                }, 1000);
+            }
+
+            function endRound() {
+                if (state.currentRound < settings.rounds) {
+                    state.currentRound++;
+                    startBreathingPhase();
+                } else {
+                    resetApp();
+                }
+            }
+            
+            function resetApp() {
+                clearInterval(state.intervalId);
+                clearInterval(state.holdTimerId);
+                state.currentRound = 0;
+                state.currentBreath = 0;
+                state.phase = 'setup';
+                breathingCircle.classList.remove('breathing-in');
+                showScreen('setup');
+            }
+
+            // --- Event Listeners ---
+            startBtn.addEventListener('click', startSession);
+            stopHoldBtn.addEventListener('click', stopHoldPhase);
+            resetBtn.addEventListener('click', resetApp);
+        });
+    </script>
+</body>
+</html>
