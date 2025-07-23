@@ -8,7 +8,7 @@
     <script src="https://cdn.tailwindcss.com"></script>
     <style>
         /* Custom font import - Inter */
-        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@700&display=swap');
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;700&display=swap');
         body {
             font-family: 'Inter', sans-serif;
             background-color: #E6E7E6; /* Solid black background */
@@ -48,6 +48,25 @@
         .content-wrapper {
             position: relative;
             z-index: 2; /* Ensure text is above the overlay */
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+        .app-link {
+            margin-top: 2rem; /* Abstand zum Titel */
+            font-size: 1.25rem; /* Schriftgrösse */
+            font-weight: 400;
+            color: rgba(255, 255, 255, 0.8); /* Leicht transparentes Weiss */
+            text-decoration: none; /* Keine Unterstreichung */
+            border: 1px solid rgba(255, 255, 255, 0.5); /* Dezenter Rahmen */
+            padding: 0.5rem 1.5rem; /* Innenabstand */
+            border-radius: 9999px; /* Vollständig abgerundete Ecken */
+            transition: all 0.3s ease; /* Sanfter Übergang für Hover-Effekt */
+        }
+        .app-link:hover {
+            background-color: rgba(255, 255, 255, 0.1);
+            color: white;
+            border-color: white;
         }
     </style>
 </head>
@@ -56,6 +75,9 @@
     <div class="background-container">
         <div class="content-wrapper">
             <h1 class="text-6xl md:text-8xl font-bold uppercase tracking-wider">Carpe Diem</h1>
+            
+            <!-- HIER IST DER NEUE LINK -->
+            <a href="./atem-app/" class="app-link">Zur Atemübung</a>
         </div>
     </div>
 
