@@ -1,0 +1,59 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Carpe Diem</title>
+    <!-- Tailwind CSS CDN for easy styling -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        /* Custom font import - Inter */
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@700&display=swap');
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: #E6E7E6; /* Solid black background */
+            margin: 0; /* Remove default body margin */
+            overflow: hidden; /* Prevent scrolling if content is just one screen */
+        }
+        .background-container {
+            /* Set the background image */
+            background-image: url('PandaOnSwing.png'); /* Placeholder: Black background, white text, simulating B&W panda */
+            background-size: 60%; /* Cover the entire container */
+            background-position: center; /* Center the image */
+            background-repeat: no-repeat; /* Do not repeat the image */
+            height: 100vh; /* Full viewport height */
+            width: 100vw; /* Full viewport width */
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            text-align: center;
+            color: white; /* White text for contrast */
+            /* Optional: Add an overlay for better text readability if the image is busy */
+            position: relative;
+        }
+        .background-container::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background-color: rgba(0, 0, 0, 0.3); /* Semi-transparent black overlay */
+            z-index: 1;
+        }
+        .content-wrapper {
+            position: relative;
+            z-index: 2; /* Ensure text is above the overlay */
+        }
+    </style>
+</head>
+<body>
+
+    <div class="background-container">
+        <div class="content-wrapper">
+            <h1 class="text-6xl md:text-8xl font-bold uppercase tracking-wider">Carpe Diem</h1>
+        </div>
+    </div>
+
+</body>
+</html>
