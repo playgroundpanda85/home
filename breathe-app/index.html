@@ -4,7 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Atem-App</title>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/tone/14.7.77/Tone.js"></script>
+    <!-- Die Tone.js-Bibliothek wird nicht mehr benötigt und wurde entfernt -->
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;700&display=swap');
 
@@ -14,6 +14,7 @@
             --primary-color: #FFFFFF;
             --secondary-color: #424242;
             --accent-color: #BBBBBB;
+            --error-color: #cf6679;
         }
 
         html, body {
@@ -27,32 +28,6 @@
             overflow: hidden;
         }
         
-        /* --- NEUER KNOPF: Zurück zur Homepage --- */
-        .home-btn {
-            position: absolute;
-            top: 20px;
-            left: 20px;
-            width: 40px; /* Grösse anpassen */
-            height: 40px; /* Grösse anpassen */
-            border-radius: 50%; /* Macht den Knopf rund */
-            background-color: var(--secondary-color); /* Fallback-Farbe */
-            
-            /* --- HIER BILD-URL EINFÜGEN --- */
-            /* Ersetze 'home-icon.png' mit dem Dateinamen deines Bildes. */
-            /* Das Bild muss im selben Ordner wie diese HTML-Datei sein. */
-            background-image: url('PandaOnSwing-round.png');
-            
-            background-size: cover; /* Stellt sicher, dass das Bild den Knopf ausfüllt */
-            background-position: center;
-            z-index: 100; /* Stellt sicher, dass der Knopf über allem liegt */
-            transition: transform 0.2s ease;
-        }
-
-        .home-btn:hover {
-            transform: scale(1.1); /* Leichte Vergrösserung beim Darüberfahren */
-        }
-
-
         .app-container {
             display: flex;
             justify-content: center;
@@ -72,228 +47,204 @@
             max-width: 400px;
             padding: 20px;
             box-sizing: border-box;
+            animation: fadeIn 0.5s ease;
+        }
+        
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
         }
 
         .screen.active {
             display: flex;
         }
 
-        /* --- Setup Screen --- */
-        #setup-screen h1 {
-            font-weight: 700;
-            font-size: 2.5rem;
-            margin-bottom: 40px;
-            color: var(--primary-color);
-        }
+        h1 { font-weight: 700; font-size: 2.5rem; margin-bottom: 40px; color: var(--primary-color); }
+        h2 { font-size: 1.8rem; font-weight: 400; margin-bottom: 30px; }
 
-        .form-group {
-            margin-bottom: 25px;
-            width: 100%;
-        }
+        .form-group { margin-bottom: 25px; width: 100%; }
+        .form-group label { display: block; margin-bottom: 10px; font-size: 1rem; font-weight: 400; color: var(--accent-color); }
+        .form-group input, .form-group select { width: 100%; padding: 12px; background-color: var(--secondary-color); border: 1px solid var(--secondary-color); border-radius: 8px; color: var(--text-color); font-size: 1.1rem; box-sizing: border-box; }
 
-        .form-group label {
-            display: block;
-            margin-bottom: 10px;
-            font-size: 1rem;
-            font-weight: 400;
-            color: var(--accent-color);
-        }
+        .btn { padding: 15px 40px; font-size: 1.2rem; font-weight: 700; background-color: var(--primary-color); color: var(--bg-color); border: none; border-radius: 50px; cursor: pointer; transition: transform 0.2s ease, background-color 0.2s ease; margin-top: 20px; }
+        .btn:hover { transform: scale(1.05); }
+        .btn-secondary { background-color: transparent; color: var(--accent-color); border: 1px solid var(--accent-color); }
 
-        .form-group input, .form-group select {
-            width: 100%;
-            padding: 12px;
-            background-color: var(--secondary-color);
-            border: 1px solid var(--secondary-color);
-            border-radius: 8px;
-            color: var(--text-color);
-            font-size: 1.1rem;
-            box-sizing: border-box;
-        }
-
-        .start-btn {
-            padding: 15px 40px;
-            font-size: 1.2rem;
-            font-weight: 700;
-            background-color: var(--primary-color);
-            color: var(--bg-color);
-            border: none;
-            border-radius: 50px;
-            cursor: pointer;
-            transition: transform 0.2s ease, background-color 0.2s ease;
-            margin-top: 20px;
-        }
-
-        .start-btn:hover {
-            transform: scale(1.05);
-        }
-
-        /* --- Breathing Screen --- */
-        .breathing-circle {
-            width: 200px;
-            height: 200px;
-            border-radius: 50%;
-            background-color: var(--secondary-color);
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            transition: transform 3s ease-in-out;
-        }
-
-        .breathing-circle.breathing-in {
-            transform: scale(1.5);
-            background-color: #333;
-        }
-
-        .breathing-text {
-            font-size: 2rem;
-            font-weight: 300;
-            color: var(--accent-color);
-            transition: opacity 0.5s ease;
-        }
-
-        .breath-count {
-            position: absolute;
-            bottom: 10%;
-            font-size: 1.5rem;
-            color: var(--accent-color);
-        }
+        .top-nav { position: absolute; top: 20px; right: 20px; z-index: 100; display: flex; gap: 10px; }
+        .nav-btn { background: none; border: none; cursor: pointer; padding: 10px; }
+        .nav-btn svg { width: 24px; height: 24px; stroke: var(--accent-color); transition: stroke 0.2s ease; }
+        .nav-btn:hover svg { stroke: var(--primary-color); }
         
-        .round-count {
-            position: absolute;
-            top: 10%;
-            font-size: 1.5rem;
-            color: var(--accent-color);
-        }
+        .home-btn { position: absolute; top: 20px; left: 20px; width: 40px; height: 40px; border-radius: 50%; background-color: var(--secondary-color); background-image: url('https://placehold.co/40x40/424242/FFFFFF?text=H'); background-size: cover; background-position: center; z-index: 100; transition: transform 0.2s ease; }
+        .home-btn:hover { transform: scale(1.1); }
 
-        /* --- Hold & Recovery Screens --- */
-        #hold-screen h2, #recovery-screen h2 {
-            font-size: 1.8rem;
-            font-weight: 400;
-            margin-bottom: 30px;
-        }
+        /* Breathing Circle etc. */
+        .breathing-circle { width: 200px; height: 200px; border-radius: 50%; background-color: var(--secondary-color); display: flex; justify-content: center; align-items: center; transition: all 1.5s ease-in-out; }
+        .breathing-circle.breathing-in { transform: scale(1.5); background-color: #333; }
+        .breathing-text { font-size: 2rem; font-weight: 300; color: var(--accent-color); transition: opacity 0.5s ease; }
+        .breath-count, .round-count { position: absolute; font-size: 1.5rem; color: var(--accent-color); }
+        .breath-count { bottom: 10%; }
+        .round-count { top: 10%; }
+        .timer { font-size: 5rem; font-weight: 700; color: var(--primary-color); margin-bottom: 40px; }
+        .hold-btn { width: 180px; height: 180px; border-radius: 50%; background-color: var(--primary-color); color: var(--bg-color); border: none; font-size: 1.5rem; font-weight: 700; cursor: pointer; display: flex; justify-content: center; align-items: center; transition: transform 0.2s ease; }
+        .hold-btn:hover { transform: scale(1.05); }
 
-        .timer {
-            font-size: 5rem;
-            font-weight: 700;
-            color: var(--primary-color);
-            margin-bottom: 40px;
-        }
-
-        .hold-btn {
-            width: 180px;
-            height: 180px;
-            border-radius: 50%;
-            background-color: var(--primary-color);
-            color: var(--bg-color);
-            border: none;
-            font-size: 1.5rem;
-            font-weight: 700;
-            cursor: pointer;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            transition: transform 0.2s ease;
-        }
-
-        .hold-btn:hover {
-            transform: scale(1.05);
-        }
-
-        /* --- Reset Button --- */
-        .reset-btn {
-            position: absolute;
-            top: 20px;
-            right: 20px;
-            background: none;
-            border: none;
-            cursor: pointer;
-            padding: 10px;
-        }
-
-        .reset-btn svg {
-            width: 24px;
-            height: 24px;
-            stroke: var(--accent-color);
-            transition: stroke 0.2s ease;
-        }
+        /* Login Screen */
+        #login-screen .form-group { margin-bottom: 15px; }
+        .toggle-link { color: var(--accent-color); cursor: pointer; margin-top: 15px; text-decoration: underline; }
+        .error-message { color: var(--error-color); margin-top: 10px; height: 20px; }
         
-        .reset-btn:hover svg {
-            stroke: var(--primary-color);
-        }
-
+        /* History Screen */
+        #history-screen ul { list-style: none; padding: 0; width: 100%; max-height: 60vh; overflow-y: auto; }
+        #history-screen li { background-color: var(--secondary-color); padding: 15px; border-radius: 8px; margin-bottom: 10px; }
+        .session-date { font-weight: 700; display: block; margin-bottom: 10px; }
+        .session-times { font-size: 0.9rem; color: var(--accent-color); }
+        
+        /* Results Screen */
+        #results-screen ul { list-style: none; padding: 0; margin-bottom: 30px; width: 100%; }
+        #results-screen li { font-size: 1.2rem; padding: 10px 0; border-bottom: 1px solid var(--secondary-color); }
+        #results-screen li:last-child { border-bottom: none; }
+        .average-time { font-size: 1.5rem; font-weight: 700; margin-top: 20px; color: var(--primary-color); }
     </style>
 </head>
 <body>
-    
-    <!-- NEUER KNOPF: Link zur Homepage -->
-    <a href="../" class="home-btn"></a>
+    <!--
+      HIER DIE AUDIO-DATEIEN DEFINIEREN:
+      - Dies sind Beispiel-URLs. Ersetze sie durch deine eigenen Audio-Dateien.
+      - Wenn du die App selbst hostest, kannst du lokale Pfade verwenden (z.B. 'inhale.mp3').
+    -->
+    <div id="audio-container" style="display: none;">
+        <audio id="audio-inhale" src="https://upload.wikimedia.org/wikipedia/commons/5/5c/Breathe-in.ogg" preload="auto"></audio>
+        <audio id="audio-exhale" src="https://upload.wikimedia.org/wikipedia/commons/3/34/Breathe-out.ogg" preload="auto"></audio>
+        <audio id="audio-bowl" src="https://upload.wikimedia.org/wikipedia/commons/1/1f/Tibetan_Singing_Bowl_Gong.ogg" preload="auto"></audio>
+    </div>
+
+    <div id="app-wrapper" style="display: none;">
+        <a href="../" class="home-btn"></a>
+        <div class="top-nav">
+            <button class="nav-btn" id="history-btn" title="Verlauf">
+                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M3.75 6.75h16.5M3.75 12h16.5m-16.5 5.25h16.5" /></svg>
+            </button>
+            <button class="nav-btn" id="logout-btn" title="Logout">
+                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M15.75 9V5.25A2.25 2.25 0 0013.5 3h-6a2.25 2.25 0 00-2.25 2.25v13.5A2.25 2.25 0 007.5 21h6a2.25 2.25 0 002.25-2.25V15M12 9l-3 3m0 0l3 3m-3-3h12.75" /></svg>
+            </button>
+        </div>
+    </div>
 
     <div class="app-container">
-        <button class="reset-btn" id="reset-btn">
-            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor">
-              <path stroke-linecap="round" stroke-linejoin="round" d="M8.25 9V5.25A2.25 2.25 0 0 1 10.5 3h6a2.25 2.25 0 0 1 2.25 2.25v13.5A2.25 2.25 0 0 1 16.5 21h-6a2.25 2.25 0 0 1-2.25-2.25V15m-3 0-3-3m0 0 3-3m-3 3H15" />
-            </svg>
-        </button>
-
-        <!-- Setup Screen -->
-        <div id="setup-screen" class="screen active">
-            <h1>Atemübung</h1>
+        <!-- Login Screen -->
+        <div id="login-screen" class="screen active">
+            <h1 id="login-title">Login</h1>
             <div class="form-group">
-                <label for="breath-count-input">Atemzüge pro Runde</label>
-                <input type="number" id="breath-count-input" value="30" min="10" max="60">
+                <input type="text" id="username-input" placeholder="Benutzername">
             </div>
             <div class="form-group">
-                <label for="rhythm-select">Rhythmus</label>
-                <select id="rhythm-select">
-                    <option value="4000">Langsam (4s)</option>
-                    <option value="3000" selected>Mittel (3s)</option>
-                    <option value="2000">Schnell (2s)</option>
-                </select>
+                <input type="password" id="password-input" placeholder="Passwort">
             </div>
-            <div class="form-group">
-                <label for="round-count-input">Anzahl Runden</label>
-                <input type="number" id="round-count-input" value="3" min="1" max="10">
-            </div>
-            <button id="start-btn" class="start-btn">Start</button>
+            <p id="error-message" class="error-message"></p>
+            <button id="login-action-btn" class="btn">Login</button>
+            <p id="toggle-form-link" class="toggle-link">Noch kein Konto? Registrieren</p>
         </div>
 
-        <!-- Breathing Screen (Phase 1) -->
-        <div id="breathing-screen" class="screen">
-            <div class="round-count" id="round-count-display"></div>
-            <div class="breathing-circle" id="breathing-circle">
-                <span class="breathing-text" id="breathing-text"></span>
+        <!-- App Screens -->
+        <div id="main-app-screens" style="display: none;">
+            <!-- Setup Screen -->
+            <div id="setup-screen" class="screen">
+                <h1>Atemübung</h1>
+                <div class="form-group">
+                    <label for="breath-count-input">Atemzüge pro Runde</label>
+                    <input type="number" id="breath-count-input" value="30" min="10" max="60">
+                </div>
+                <div class="form-group">
+                    <label for="rhythm-select">Rhythmus</label>
+                    <select id="rhythm-select">
+                        <option value="2000">Langsam (2s)</option>
+                        <option value="1500" selected>Mittel (1.5s)</option>
+                        <option value="1000">Schnell (1s)</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label for="round-count-input">Anzahl Runden</label>
+                    <input type="number" id="round-count-input" value="3" min="1" max="10">
+                </div>
+                <button id="start-btn" class="btn">Start</button>
             </div>
-            <div class="breath-count" id="breath-count-display"></div>
-        </div>
 
-        <!-- Hold Screen (Phase 2) -->
-        <div id="hold-screen" class="screen">
-            <h2>Luft anhalten</h2>
-            <div class="timer" id="hold-timer">00:00</div>
-            <button class="hold-btn" id="stop-hold-btn">Weiter</button>
-        </div>
+            <!-- Breathing Screen -->
+            <div id="breathing-screen" class="screen">
+                <div class="round-count" id="round-count-display"></div>
+                <div class="breathing-circle" id="breathing-circle"><span class="breathing-text" id="breathing-text"></span></div>
+                <div class="breath-count" id="breath-count-display"></div>
+            </div>
 
-        <!-- Recovery Screen (Phase 3) -->
-        <div id="recovery-screen" class="screen">
-            <h2>Tief einatmen und halten</h2>
-            <div class="timer" id="recovery-timer">15</div>
+            <!-- Hold Screen -->
+            <div id="hold-screen" class="screen">
+                <h2>Luft anhalten</h2>
+                <div class="timer" id="hold-timer">00:00</div>
+                <button class="hold-btn" id="stop-hold-btn">Weiter</button>
+            </div>
+
+            <!-- Recovery Screen -->
+            <div id="recovery-screen" class="screen">
+                <h2>Tief einatmen und halten</h2>
+                <div class="timer" id="recovery-timer">15</div>
+            </div>
+            
+            <!-- Results Screen -->
+            <div id="results-screen" class="screen">
+                <h1>Ergebnisse</h1>
+                <ul id="results-list"></ul>
+                <p class="average-time" id="average-time-display"></p>
+                <button id="new-session-btn" class="btn">Neue Übung</button>
+            </div>
+
+            <!-- History Screen -->
+            <div id="history-screen" class="screen">
+                <h1>Mein Verlauf</h1>
+                <ul id="history-list"></ul>
+                <button id="back-to-app-btn" class="btn">Zurück</button>
+            </div>
         </div>
     </div>
 
     <script>
         document.addEventListener('DOMContentLoaded', () => {
             // --- DOM Elements ---
+            const loginScreen = document.getElementById('login-screen');
+            const mainAppScreens = document.getElementById('main-app-screens');
+            const appWrapper = document.getElementById('app-wrapper');
+
             const screens = {
+                login: loginScreen,
                 setup: document.getElementById('setup-screen'),
                 breathing: document.getElementById('breathing-screen'),
                 hold: document.getElementById('hold-screen'),
                 recovery: document.getElementById('recovery-screen'),
+                results: document.getElementById('results-screen'),
+                history: document.getElementById('history-screen'),
             };
 
-            const startBtn = document.getElementById('start-btn');
-            const resetBtn = document.getElementById('reset-btn');
-            const stopHoldBtn = document.getElementById('stop-hold-btn');
+            // Audio elements
+            const inhaleAudio = document.getElementById('audio-inhale');
+            const exhaleAudio = document.getElementById('audio-exhale');
+            const bowlAudio = document.getElementById('audio-bowl');
 
+            // Login elements
+            const loginTitle = document.getElementById('login-title');
+            const usernameInput = document.getElementById('username-input');
+            const passwordInput = document.getElementById('password-input');
+            const loginActionBtn = document.getElementById('login-action-btn');
+            const toggleFormLink = document.getElementById('toggle-form-link');
+            const errorMessage = document.getElementById('error-message');
+
+            // App elements
+            const startBtn = document.getElementById('start-btn');
+            const stopHoldBtn = document.getElementById('stop-hold-btn');
+            const newSessionBtn = document.getElementById('new-session-btn');
+            const historyBtn = document.getElementById('history-btn');
+            const backToAppBtn = document.getElementById('back-to-app-btn');
+            const logoutBtn = document.getElementById('logout-btn');
+            
             const breathCountInput = document.getElementById('breath-count-input');
             const rhythmSelect = document.getElementById('rhythm-select');
             const roundCountInput = document.getElementById('round-count-input');
@@ -304,56 +255,140 @@
             const roundCountDisplay = document.getElementById('round-count-display');
             const holdTimerDisplay = document.getElementById('hold-timer');
             const recoveryTimerDisplay = document.getElementById('recovery-timer');
+            const resultsList = document.getElementById('results-list');
+            const averageTimeDisplay = document.getElementById('average-time-display');
+            const historyList = document.getElementById('history-list');
 
             // --- App State ---
-            let settings = {
-                breaths: 30,
-                rhythm: 3000,
-                rounds: 3,
-            };
-            let state = {
-                currentRound: 0,
-                currentBreath: 0,
-                phase: 'setup', // 'setup', 'breathing', 'hold', 'recovery'
-                intervalId: null,
-                holdTimerId: null,
+            let settings = {};
+            let state = {};
+            let authState = {
+                isLoginView: true,
+                currentUser: null
             };
 
-            // --- Audio Synthesis (Tone.js) ---
-            let breathSynth, gongSynth;
+            function initializeState() {
+                settings = { breaths: 30, rhythm: 1500, rounds: 3 };
+                state = { currentRound: 0, currentBreath: 0, holdSeconds: 0, holdTimes: [], intervalId: null, holdTimerId: null, lastScreen: 'setup' };
+            }
             
-            function initializeAudio() {
-                if (!breathSynth) {
-                    breathSynth = new Tone.Synth({
-                        oscillator: { type: 'sine' },
-                        envelope: { attack: 0.1, decay: 0.5, sustain: 0.1, release: 1 },
-                    }).toDestination();
-                }
-                if (!gongSynth) {
-                     gongSynth = new Tone.MembraneSynth({
-                        pitchDecay: 0.05,
-                        octaves: 10,
-                        oscillator: { type: 'sine' },
-                        envelope: { attack: 0.001, decay: 0.8, sustain: 0.01, release: 1.4, attackCurve: 'exponential' }
-                    }).toDestination();
+            initializeState();
+
+            // --- Audio Playback ---
+            function playAudio(audioElement) {
+                if (audioElement) {
+                    audioElement.currentTime = 0; // Rewind to start
+                    audioElement.play().catch(e => console.error("Audio-Fehler:", e));
                 }
             }
 
             function playBreathSound(isInhale) {
-                if (!breathSynth) return;
-                const note = isInhale ? 'C4' : 'G3';
-                breathSynth.triggerAttackRelease(note, '8n');
+                if (isInhale) {
+                    playAudio(inhaleAudio);
+                } else {
+                    playAudio(exhaleAudio);
+                }
             }
 
-            function playGong() {
-                if (!gongSynth) return;
-                gongSynth.triggerAttackRelease('C2', '1n');
+            function playBowlSound() {
+                playAudio(bowlAudio);
             }
 
             // --- Screen Management ---
             function showScreen(screenName) {
                 Object.values(screens).forEach(screen => screen.classList.remove('active'));
-                screens[screenName].classList.add('active');
+                if (screenName !== 'login') {
+                    loginScreen.style.display = 'none';
+                    mainAppScreens.style.display = 'block';
+                    appWrapper.style.display = 'block';
+                    screens[screenName].classList.add('active');
+                    if (screenName !== 'history') {
+                        state.lastScreen = screenName;
+                    }
+                } else {
+                    mainAppScreens.style.display = 'none';
+                    appWrapper.style.display = 'none';
+                    loginScreen.style.display = 'flex';
+                    loginScreen.classList.add('active');
+                }
+            }
+
+            // --- Authentication (using localStorage) ---
+            function getUsers() { return JSON.parse(localStorage.getItem('breathing_app_users')) || {}; }
+            function saveUsers(users) { localStorage.setItem('breathing_app_users', JSON.stringify(users)); }
+
+            function handleAuthAction() {
+                const username = usernameInput.value.trim();
+                const password = passwordInput.value.trim();
+                if (!username || !password) {
+                    errorMessage.textContent = 'Bitte beide Felder ausfüllen.';
+                    return;
+                }
+                errorMessage.textContent = '';
+                const users = getUsers();
+
+                if (authState.isLoginView) { // Login
+                    if (users[username] && users[username].password === password) {
+                        authState.currentUser = username;
+                        showScreen('setup');
+                    } else {
+                        errorMessage.textContent = 'Benutzername oder Passwort falsch.';
+                    }
+                } else { // Signup
+                    if (users[username]) {
+                        errorMessage.textContent = 'Benutzername bereits vergeben.';
+                    } else {
+                        users[username] = { password: password, history: [] };
+                        saveUsers(users);
+                        authState.currentUser = username;
+                        showScreen('setup');
+                    }
+                }
+            }
+            
+            function toggleAuthView() {
+                authState.isLoginView = !authState.isLoginView;
+                loginTitle.textContent = authState.isLoginView ? 'Login' : 'Registrieren';
+                loginActionBtn.textContent = authState.isLoginView ? 'Login' : 'Registrieren';
+                toggleFormLink.textContent = authState.isLoginView ? 'Noch kein Konto? Registrieren' : 'Bereits ein Konto? Login';
+                errorMessage.textContent = '';
+            }
+            
+            function logout() {
+                authState.currentUser = null;
+                usernameInput.value = '';
+                passwordInput.value = '';
+                showScreen('login');
+            }
+
+            // --- Data Persistence ---
+            function saveSession() {
+                if (!authState.currentUser) return;
+                const users = getUsers();
+                const sessionData = {
+                    date: new Date().toISOString(),
+                    times: state.holdTimes
+                };
+                users[authState.currentUser].history.unshift(sessionData); // Add to beginning
+                saveUsers(users);
+            }
+            
+            function loadHistory() {
+                if (!authState.currentUser) return;
+                const users = getUsers();
+                const history = users[authState.currentUser].history || [];
+                historyList.innerHTML = '';
+                if (history.length === 0) {
+                    historyList.innerHTML = '<li>Noch keine Übungen gespeichert.</li>';
+                    return;
+                }
+                history.forEach(session => {
+                    const li = document.createElement('li');
+                    const date = new Date(session.date).toLocaleString('de-DE', { dateStyle: 'medium', timeStyle: 'short' });
+                    const times = session.times.map(t => formatTime(t)).join(', ');
+                    li.innerHTML = `<span class="session-date">${date}</span><span class="session-times">Zeiten: ${times}</span>`;
+                    historyList.appendChild(li);
+                });
             }
 
             // --- Helper Functions ---
@@ -365,42 +400,28 @@
 
             // --- Core Logic ---
             function startSession() {
-                // Ensure audio context is started by user gesture
-                if (Tone.context.state !== 'running') {
-                    Tone.start();
-                }
-                initializeAudio();
-
+                initializeState();
                 settings.breaths = parseInt(breathCountInput.value);
                 settings.rhythm = parseInt(rhythmSelect.value);
                 settings.rounds = parseInt(roundCountInput.value);
-                
                 state.currentRound = 1;
                 startBreathingPhase();
             }
 
             function startBreathingPhase() {
-                state.phase = 'breathing';
                 showScreen('breathing');
                 roundCountDisplay.textContent = `Runde ${state.currentRound} / ${settings.rounds}`;
-                
                 state.currentBreath = 0;
-                let isBreathingIn = true;
-
-                // Initial breath
+                let breathCycleStep = 0;
+                const totalSteps = settings.breaths * 2;
                 setTimeout(() => {
                     breathe();
                     state.intervalId = setInterval(breathe, settings.rhythm);
                 }, 500);
 
                 function breathe() {
-                    if (state.currentBreath >= settings.breaths) {
-                        clearInterval(state.intervalId);
-                        playGong();
-                        setTimeout(startHoldPhase, 1000); // Wait for gong to fade
-                        return;
-                    }
-
+                    breathCycleStep++;
+                    const isBreathingIn = breathCycleStep % 2 !== 0;
                     if (isBreathingIn) {
                         state.currentBreath++;
                         breathingText.textContent = 'Ein';
@@ -412,36 +433,36 @@
                         breathingCircle.classList.remove('breathing-in');
                         playBreathSound(false);
                     }
-                    isBreathingIn = !isBreathingIn;
+                    if (breathCycleStep >= totalSteps) {
+                        clearInterval(state.intervalId);
+                        breathingText.textContent = 'Aus';
+                        breathingCircle.classList.remove('breathing-in');
+                        setTimeout(() => { playBowlSound(); startHoldPhase(); }, settings.rhythm);
+                    }
                 }
             }
 
             function startHoldPhase() {
-                state.phase = 'hold';
                 showScreen('hold');
-                
-                let holdSeconds = 0;
-                holdTimerDisplay.textContent = formatTime(holdSeconds);
-
+                state.holdSeconds = 0;
+                holdTimerDisplay.textContent = formatTime(state.holdSeconds);
                 state.holdTimerId = setInterval(() => {
-                    holdSeconds++;
-                    holdTimerDisplay.textContent = formatTime(holdSeconds);
+                    state.holdSeconds++;
+                    holdTimerDisplay.textContent = formatTime(state.holdSeconds);
                 }, 1000);
             }
 
             function stopHoldPhase() {
                 clearInterval(state.holdTimerId);
-                playGong();
-                startRecoveryPhase();
+                state.holdTimes.push(state.holdSeconds);
+                playBowlSound();
+                setTimeout(startRecoveryPhase, 2000);
             }
 
             function startRecoveryPhase() {
-                state.phase = 'recovery';
                 showScreen('recovery');
-
                 let recoverySeconds = 15;
                 recoveryTimerDisplay.textContent = recoverySeconds;
-
                 state.intervalId = setInterval(() => {
                     recoverySeconds--;
                     recoveryTimerDisplay.textContent = recoverySeconds;
@@ -457,36 +478,39 @@
                     state.currentRound++;
                     startBreathingPhase();
                 } else {
-                    resetApp();
+                    saveSession();
+                    displayResults();
                 }
             }
             
-            function resetApp() {
-                clearInterval(state.intervalId);
-                clearInterval(state.holdTimerId);
-                state.currentRound = 0;
-                state.currentBreath = 0;
-                state.phase = 'setup';
-                breathingCircle.classList.remove('breathing-in');
-                showScreen('setup');
+            function displayResults() {
+                showScreen('results');
+                resultsList.innerHTML = '';
+                state.holdTimes.forEach((time, index) => {
+                    const li = document.createElement('li');
+                    li.textContent = `Runde ${index + 1}: ${formatTime(time)}`;
+                    resultsList.appendChild(li);
+                });
+                const totalSeconds = state.holdTimes.reduce((acc, time) => acc + time, 0);
+                const averageSeconds = Math.round(totalSeconds / state.holdTimes.length);
+                averageTimeDisplay.textContent = `Durchschnitt: ${formatTime(averageSeconds)}`;
             }
-
+            
             // --- Event Listeners ---
+            loginActionBtn.addEventListener('click', handleAuthAction);
+            toggleFormLink.addEventListener('click', toggleAuthView);
+            logoutBtn.addEventListener('click', logout);
+            
             startBtn.addEventListener('click', startSession);
             stopHoldBtn.addEventListener('click', stopHoldPhase);
-            resetBtn.addEventListener('click', resetApp);
+            newSessionBtn.addEventListener('click', () => showScreen('setup'));
+            
+            historyBtn.addEventListener('click', () => {
+                loadHistory();
+                showScreen('history');
+            });
+            backToAppBtn.addEventListener('click', () => showScreen(state.lastScreen));
         });
     </script>
 </body>
 </html>
-```
-
-### So personalisierst du den Knopf:
-
-1.  **Bild vorbereiten:** Erstelle ein kleines, rundes Bild (z.B. im Format `.png` oder `.jpg`) und gib ihm einen einfachen Namen, z.B. `home-icon.png`.
-2.  **Bild hochladen:** Lege diese Bilddatei in den `atem-app`-Ordner in deinem GitHub-Repository, also genau dorthin, wo auch die `index.html`-Datei der App liegt.
-3.  **Code anpassen:**
-    * Suche im CSS-Code nach dem Kommentar `/* --- HIER BILD-URL EINFÜGEN --- */`.
-    * Ändere die Zeile `background-image: url('https://placehold.co/40x40/424242/FFFFFF?text=H');` zu `background-image: url('home-icon.png');` (ersetze `home-icon.png` mit deinem Dateinamen).
-
-Der Link `href="../"` im neuen `<a>`-Tag sorgt dafür, dass du immer korrekt eine Ebene nach oben zur Homepage navigierst, genau wie in der Anleitung beschrieb
